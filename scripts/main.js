@@ -23,6 +23,14 @@ NEIN.Main = {
 		this.y = -64;
 		this.v = 1;
 		this.a = 40;
+		this.offset = 240;
+
+		this.map = [];
+		var obstacles = [this.app.images.stamm, this.app.images.tor];
+
+		for(i=0; i<20; i++) {
+			this.map.push({"x": Math.random()*640-64, "y": i*100, "type": obstacles[Math.floor(Math.random()*obstacles.length)]});
+		}
 	},
 	leave: function() {
 	},
@@ -41,7 +49,11 @@ NEIN.Main = {
 
 		this.app.layer
 			.clear("#fff")
-			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.y);
+			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
+
+		for(i=0; i<20; i++) {
+			this.app.layer.drawImage(this.map[i].type, this.map[i].x, this.map[i].y-this.y+this.offset);
+		}
 	}
 };
 
@@ -56,13 +68,13 @@ NEIN.Score = {
 
 playground({
 	create: function() {
-		this.loadImage("nein");
+		this.loadImage("nein","tor","stamm");
 		this.loadAtlas("guy");	
 	},
 	ready: function() {
 		this.setState(NEIN.Title);
 	},
-	scale: 1.2,
+	scale: 1,
 	width: 640,
 	height: 480
 });
