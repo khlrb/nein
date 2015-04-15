@@ -21,16 +21,23 @@ NEIN.Main = {
 	enter: function() {
 		this.x = 298;
 		this.y = -64;
-		this.v = 0;
+		this.v = 1;
+		this.a = 40;
 	},
 	leave: function() {
 	},
 	step: function(dt) {
+		if(this.app.keyboard.keys.down) {
+			this.v += dt*this.a;
+		}
+		else if(this.app.keyboard.keys.up) {
+			this.v = this.v < 0 ? 0 : this.v - dt*this.a;
+		}
+
 		this.y += dt*this.v;
-		this.v += dt*40;
 	},
 	render: function(dt) {
-		var current = (this.app.lifetime % 2 / 2) * this.app.atlases.guy.frames.length | 0;
+		var current = this.v > 40 ? (this.app.lifetime % 2 / 2) * this.app.atlases.guy.frames.length | 0 : 0;
 
 		this.app.layer
 			.clear("#fff")
