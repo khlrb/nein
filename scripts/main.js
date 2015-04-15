@@ -1,13 +1,19 @@
 var NEIN = {};
 
 NEIN.Title = {
-	create: function() {
-	},
 	render: function(dt) {
 		this.app.layer
 			.clear("#fff")
 			.fillStyle("#5555ee")
-			.fillRect(0, 0, 640, 300);
+			.fillRect(0, 0, 640, 300)
+			.drawImage(this.app.images.nein, 170, 20)
+			.font('12pt Monospace')
+			.textAlign('center')
+			.fillStyle("#111")
+			.fillText("press any key", 320, 420);
+	},
+	keydown: function(event) {
+		this.app.setState(NEIN.Main);
 	}
 }
 
@@ -21,6 +27,8 @@ NEIN.Main = {
 	step: function(dt) {
 	},
 	render: function(dt) {
+		this.app.layer
+			.clear("#fff");
 	}
 };
 
@@ -34,6 +42,9 @@ NEIN.Score = {
 };
 
 playground({
+	create: function() {
+		this.loadImage("nein");
+	},
 	ready: function() {
 		this.setState(NEIN.Title);
 	},
