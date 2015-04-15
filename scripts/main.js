@@ -31,7 +31,7 @@ NEIN.Main = {
 			this.v += dt*this.a;
 		}
 		else if(this.app.keyboard.keys.up) {
-			this.v = this.v < 0 ? 0 : this.v - dt*this.a;
+			this.v = this.v - dt*this.a < 0 ? 0 : this.v - dt*this.a;
 		}
 
 		this.y += dt*this.v;
