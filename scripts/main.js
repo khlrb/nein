@@ -30,7 +30,7 @@ NEIN.Main = {
         this.stars = 0;
         this.collisions = 0;
         this.time = 0;
-        this.length = 200;
+        this.length = 20;
         this.offset = 240;
         
         this.finishline = {
@@ -150,8 +150,17 @@ NEIN.Score = {
     },
     render: function(dt) {
         this.app.layer
-            .fillStyle("#000")
-            .fillRect(0, 0, 640, 480);
+            .clear("#5555ee")
+	    .fillStyle("#00ffff")
+	    .font("20pt Monospace")
+	    .textAlign("center")
+	    .fillText("Score", 320, 120)
+	    .textAlign("left")
+	    .fillStyle("#ffffff")
+	    .font("30px sans-serif")
+	    .fillText(NEIN.Main.stars, 300, 195)
+	    .fillText(Math.round(NEIN.Main.time*10)/10, 300, 235)
+	    .drawImage(this.app.images.star, 260, 170);
     }
 };
 
