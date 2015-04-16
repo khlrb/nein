@@ -23,6 +23,9 @@ NEIN.Main = {
 		this.y = -64;
 		this.v = 50;
 		this.a = 10;
+		this.plings = ["pling0", "pling1", "pling2", "pling3"];
+		this.crashes = ["crash0", "crash1"];
+		this.steer = ["steer0", "steer1", "steer2", "steer3", "steer4"];
         this.stars = 0;
         this.collisions = 0;
 		this.offset = 240;
@@ -43,6 +46,11 @@ NEIN.Main = {
 		}
 	},
 	leave: function() {
+	},
+	keydown: function(event) {
+		if(event.key === "left" || event.key === "right") {
+			this.app.sound.play(this.steer[Math.random()*this.steer.length | 0]);
+		}
 	},
 	step: function(dt) {
 		this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
@@ -76,11 +84,13 @@ NEIN.Main = {
                     switch(obst.type){
                     case 'star':
                         that.stars += 1;
+			that.app.sound.play(that.plings[Math.random()*that.plings.length | 0]);
                         break;
                     default:
                         that.collisions += 1;
                         that.v = 50;
                         that.a = 10;
+			that.app.sound.play(that.crashes[Math.random()*that.crashes.length | 0]);
                     }
                 }
             });
@@ -126,7 +136,8 @@ NEIN.Score = {
 playground({
 	create: function() {
 		this.loadImage("nein","tor","stamm","star","stone","tree");
-		this.loadAtlas("guy");	
+		this.loadAtlas("guy");
+		this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4");
 	},
 	ready: function() {
 		this.setState(NEIN.Title);
