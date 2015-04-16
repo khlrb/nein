@@ -37,6 +37,8 @@ NEIN.Main = {
         this.penalty = 0;
         this.wait = 3;
         this.pressButtonX = 320;
+        this.currentAtlas = this.app.atlases.guy;
+        this.direction = 0;
         
         
         this.app.tween(this)
@@ -75,14 +77,21 @@ NEIN.Main = {
             this.wait = this.wait - dt < 0 ? 0 : this.wait - dt;
         }
         else {
+            
+            this.currentAtlas = this.app.atlases.guy;
+            this.direction = 0;
             this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
 
-            if(this.app.keyboard.keys.right) {
-             this.x = this.x + dt*this.v > 576 ? 576 : this.x + dt*this.v;
+            if(this.app.keyboard.keys.right && !this.app.keyboard.keys.left) {
+                this.x = this.x + dt*this.v > 576 ? 576 : this.x + dt*this.v;
+                this.currentAtlas = this.app.atlases.slide_right;
+                this.direction = -1;
             }
         
-            if(this.app.keyboard.keys.left) {
+            if(this.app.keyboard.keys.left && !this.app.keyboard.keys.right) {
                 this.x = this.x - dt*this.v < 0 ? 0 : this.x - dt*this.v;
+                this.currentAtlas = this.app.atlases.slide_left;
+                this.direction = 1;
 	        }
 
             this.y += dt*this.v;
@@ -173,7 +182,15 @@ NEIN.Main = {
             }
         }
 
-        if(this.penalty === 0) this.app.layer.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
+        if(this.penalty === 0){
+            var angle = this.direction * (Math.PI/10 - (Math.random() * Math.PI/30));
+            this.app.layer.save()
+                .translate(this.x, this.offset)
+                .translate(guy.width/2, guy.height/2)
+                .rotate(angle)
+                .drawAtlasFrame(this.currentAtlas, current, guy.width/-2, guy.height/-2)
+                .restore();
+        }
         if(this.wait > 0.5) this.app.layer.fillStyle('#fff')
                                 .fillRect(0, 300, 640, 80);
 
@@ -241,7 +258,7 @@ PLAYGROUND.Transitions.prototype.postrender = function(){
 playground({
     create: function() {
         this.loadImage("nein","tor","stamm","star","stone","tree","watch","crashed");
-        this.loadAtlas("guy");
+        this.loadAtlas("guy", "slide_right", "slide_left");
         this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4","yay");
     },
     ready: function() {
