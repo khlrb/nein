@@ -32,6 +32,7 @@ NEIN.Main = {
         this.time = 0;
         this.length = 50;
         this.offset = 240;
+        this.penalty = 0;
         
         this.finishline = {
             "y": this.length*80+300,
@@ -61,17 +62,22 @@ NEIN.Main = {
         }
     },
     step: function(dt) {
-        this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
-
-        if(this.app.keyboard.keys.right) {
-            this.x = this.x + dt*this.v > 576 ? 576 : this.x + dt*this.v;
+        if(this.penalty > 0) {
+            this.penalty = this.penalty - dt < 0 ? 0 : this.penalty - dt;
         }
-        
-        if(this.app.keyboard.keys.left) {
-            this.x = this.x - dt*this.v < 0 ? 0 : this.x - dt*this.v;
-	}
+        else {
+            this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
 
-        this.y += dt*this.v;
+            if(this.app.keyboard.keys.right) {
+             this.x = this.x + dt*this.v > 576 ? 576 : this.x + dt*this.v;
+            }
+        
+            if(this.app.keyboard.keys.left) {
+                this.x = this.x - dt*this.v < 0 ? 0 : this.x - dt*this.v;
+	        }
+
+            this.y += dt*this.v;
+        }
 
         if(this.y + this.app.atlases.guy.frames[0].height > this.finishline.y && !this.finished) {
             this.app.sound.play("yay");
@@ -111,13 +117,15 @@ NEIN.Main = {
                     switch(obst.type){
                     case 'star':
                         that.stars += 1;
-            that.app.sound.play(that.plings[Math.random()*that.plings.length | 0]);
+                        that.app.sound.play(that.plings[Math.random()*that.plings.length | 0]);
                         break;
                     default:
                         that.collisions += 1;
                         that.v = 50;
                         that.a = 10;
-            that.app.sound.play(that.crashes[Math.random()*that.crashes.length | 0]);
+                        that.penalty = 0.5;
+                        that.y += 10;
+                        that.app.sound.play(that.crashes[Math.random()*that.crashes.length | 0]);
                     }
                 }
             });
@@ -148,7 +156,7 @@ NEIN.Main = {
             }
         }
 
-       this.app.layer.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
+        if(this.penalty === 0) this.app.layer.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
 
         for(var i=0; i<this.length; i++) {
             var img = this.app.images[this.map[i].type];
@@ -163,6 +171,7 @@ NEIN.Main = {
             }
         }
 
+        if(this.penalty > 0) this.app.layer.drawImage(this.app.images.crashed, this.x, this.offset+10);
     }
 };
 
