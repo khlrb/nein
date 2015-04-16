@@ -13,6 +13,8 @@ NEIN.Title = {
             .fillText("press any key", 320, 420);
     },
     keydown: function(event) {
+        PLAYGROUND.Transitions.enabled = false;
+        NEIN.Main.transitionScreenshot = this.app.layer.cache();
         this.app.setState(NEIN.Main);
     }
 };
@@ -30,9 +32,16 @@ NEIN.Main = {
         this.stars = 0;
         this.collisions = 0;
         this.time = 0;
-        this.length = 50;
-        this.offset = 240;
+        this.length = 100;
+        this.offset = 300;
         this.penalty = 0;
+        this.wait = 3;
+        this.pressButtonX = 320;
+        
+        
+        this.app.tween(this)
+            .to({offset: 239, pressButtonX: -100}, 2.5)
+            .to({offset: 240}, 0.5);
         
         this.finishline = {
             "y": this.length*80+300,
@@ -48,7 +57,7 @@ NEIN.Main = {
 
         for(var i=0; i<this.length; i++) {
             this.map.push({"x": Math.random()*640-64,
-                           "y": i*80+100,
+                           "y": i*80+200,
                            "type": obstacles[Math.floor(Math.random()*obstacles.length)],
                            "angle": (Math.random()*Math.PI-(Math.PI/2))/10,
                            "mirrored": Math.random()*2|0});
@@ -62,8 +71,9 @@ NEIN.Main = {
         }
     },
     step: function(dt) {
-        if(this.penalty > 0) {
+        if(this.penalty > 0 || this.wait > 0) {
             this.penalty = this.penalty - dt < 0 ? 0 : this.penalty - dt;
+            this.wait = this.wait - dt < 0 ? 0 : this.wait - dt;
         }
         else {
             this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
@@ -89,8 +99,10 @@ NEIN.Main = {
         
         this.time += this.finished ? 0 : dt;
 
-        if(this.y > this.finishline.y + 200) this.app.setState(NEIN.Score);
-        else{
+        if(this.y > this.finishline.y + 200) {
+            PLAYGROUND.Transitions.enabled = true;
+            this.app.setState(NEIN.Score);
+        } else{
             //collision detection
             var collidingObstacles = [];
             var that = this;
@@ -136,6 +148,11 @@ NEIN.Main = {
         
         this.app.layer
             .clear("#fff")
+            .drawImage(this.transitionScreenshot, 0, 0, 640, 300, 0, 0-this.y-64, 640, 300)
+            .font('12pt Monospace')
+            .textAlign('center')
+            .fillStyle("#111")
+            .fillText("press any key", this.pressButtonX, 420-this.y-64)
             .fillStyle("#ff00ff")
             .fillRect(0, this.finishline.y-this.y+this.offset, 640, 40)
             .font(this.finishline.textSize.toString() + 'pt Monospace')
@@ -157,6 +174,8 @@ NEIN.Main = {
         }
 
         if(this.penalty === 0) this.app.layer.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
+        if(this.wait > 0.5) this.app.layer.fillStyle('#fff')
+                                .fillRect(0, 300, 640, 80);
 
         for(var i=0; i<this.length; i++) {
             var img = this.app.images[this.map[i].type];
@@ -170,9 +189,10 @@ NEIN.Main = {
                     .restore();
             }
         }
-
+        
         if(this.penalty > 0) this.app.layer.drawImage(this.app.images.crashed, this.x, this.offset+10);
-    }
+    },
+    transitionScreenshot: null
 };
 
 NEIN.Score = {
@@ -183,6 +203,8 @@ NEIN.Score = {
     render: function(dt) {
         this.app.layer
             .clear("#5555ee")
+        .fillStyle("#fff")
+        .fillRect(0, 300, 640, 180)
 	    .fillStyle("#00ffff")
 	    .font("20pt Monospace")
 	    .textAlign("center")
@@ -200,9 +222,21 @@ NEIN.Score = {
         .fillText("press any key", 320, 420);
     },
     keydown: function(){
+        PLAYGROUND.Transitions.enabled = false;
+        NEIN.Main.transitionScreenshot = this.app.layer.cache();
         this.app.setState(NEIN.Main);
     }
 };
+
+PLAYGROUND.Transitions.enabled = true;
+PLAYGROUND.Transitions.preferred = PLAYGROUND.Transitions.Split;
+PLAYGROUND.Transitions.prototype.postrender = function(){
+    if (this.progress >= 1) return;
+
+    if(PLAYGROUND.Transitions.enabled){
+        PLAYGROUND.Transitions.preferred(this, this.progress);
+    }
+}
 
 playground({
     create: function() {
