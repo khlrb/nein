@@ -160,13 +160,14 @@ NEIN.Score = {
 	    .font("30px sans-serif")
 	    .fillText(NEIN.Main.stars, 300, 195)
 	    .fillText(Math.round(NEIN.Main.time*10)/10, 300, 235)
-	    .drawImage(this.app.images.star, 260, 170);
+	    .drawImage(this.app.images.star, 260, 166)
+        .drawImage(this.app.images.watch, 260, 207);
     }
 };
 
 playground({
     create: function() {
-        this.loadImage("nein","tor","stamm","star","stone","tree");
+        this.loadImage("nein","tor","stamm","star","stone","tree","watch");
         this.loadAtlas("guy");
         this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4","yay");
     },
