@@ -64,12 +64,12 @@ NEIN.Main = {
         this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
 
         if(this.app.keyboard.keys.right) {
-            this.x = this.x + dt*100 > 576 ? 576 : this.x + dt*100;
+            this.x = this.x + dt*this.v > 576 ? 576 : this.x + dt*this.v;
         }
         
         if(this.app.keyboard.keys.left) {
-            this.x = this.x - dt*100 < 0 ? 0 : this.x - dt*100;
-        }
+            this.x = this.x - dt*this.v < 0 ? 0 : this.x - dt*this.v;
+	}
 
         this.y += dt*this.v;
 
