@@ -89,10 +89,19 @@ NEIN.Main = {
             var collidingObstacles = [];
             var that = this;
             var guy = this.app.atlases.guy.frames[0];
+            var guyy = that.y + guy.height - 50,
+                guyy2 = that.y + guy.height,
+                guyx = that.x,
+                guyx2 = that.x + guy.width;
             this.map.forEach(function(obstacle, i) {
                 var img = that.app.images[obstacle.type];
-                if (obstacle.y + img.height - 10 <= that.y + guy.height && obstacle.y + img.height >= that.y + guy.height - 50)
-                    if(obstacle.x <= that.x + guy.width && obstacle.x + img.width >= that.x)
+                var obsty = obstacle.y + img.height - 10,
+                    obsty2 = obstacle.y + img.height,
+                    obstx = obstacle.x,
+                    obstx2 = obstacle.x + img.width;
+                    
+                if (obsty < guyy2 &&  obsty2 > guyy && (obsty2 > guyy2 && obstacle.type !== 'star' || obsty2 <= guyy2 && obstacle.type === 'star'))
+                    if(obstx < guyx2 && obstx2 > guyx)
                         collidingObstacles.push(obstacle);
             });
             
@@ -159,9 +168,16 @@ NEIN.Score = {
 	    .fillStyle("#ffffff")
 	    .font("30px sans-serif")
 	    .fillText(NEIN.Main.stars, 300, 195)
-	    .fillText(Math.round(NEIN.Main.time*10)/10, 300, 235)
+	    .fillText(Math.round(NEIN.Main.time*100)/100, 300, 235)
 	    .drawImage(this.app.images.star, 260, 166)
-        .drawImage(this.app.images.watch, 260, 207);
+        .drawImage(this.app.images.watch, 260, 207)
+        .font('12pt Monospace')
+        .textAlign('center')
+        .fillStyle("#111")
+        .fillText("press any key", 320, 420);
+    },
+    keydown: function(){
+        this.app.setState(NEIN.Main);
     }
 };
 
