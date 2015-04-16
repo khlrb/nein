@@ -30,7 +30,7 @@ NEIN.Main = {
         this.stars = 0;
         this.collisions = 0;
         this.time = 0;
-        this.length = 20;
+        this.length = 50;
         this.offset = 240;
         
         this.finishline = {
@@ -91,7 +91,7 @@ NEIN.Main = {
             var guy = this.app.atlases.guy.frames[0];
             this.map.forEach(function(obstacle, i) {
                 var img = that.app.images[obstacle.type];
-                if (obstacle.y + img.height - 10 <= that.y + guy.height && obstacle.y + img.height >= that.y)
+                if (obstacle.y + img.height - 10 <= that.y + guy.height && obstacle.y + img.height >= that.y + guy.height - 50)
                     if(obstacle.x <= that.x + guy.width && obstacle.x + img.width >= that.x)
                         collidingObstacles.push(obstacle);
             });
