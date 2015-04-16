@@ -133,12 +133,26 @@ NEIN.Main = {
             .font(this.finishline.textSize.toString() + 'pt Monospace')
             .textAlign('start')
             .fillStyle("#fff")
-            .fillText(Math.round(this.time*100)/100, 50, this.finishline.y-this.y+this.offset+35)
-            .drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
+            .fillText(Math.round(this.time*100)/100, 50, this.finishline.y-this.y+this.offset+35);
 
         for(var i=0; i<this.length; i++) {
             var img = this.app.images[this.map[i].type];
-            if(!(this.map[i].type === 'star' && this.map[i].collided)){
+            if(!(this.map[i].type === 'star' && this.map[i].collided) && this.map[i].y-10 <= this.y) {
+                this.app.layer.save()
+                    .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
+                    .translate(img.width/2, img.height/2)
+                    .scale(this.map[i].mirrored?-1:1, 1)
+                    .rotate(this.map[i].angle)
+                    .drawImage(img, img.width/(-2), img.height/(-2))
+                    .restore();
+            }
+        }
+
+       this.app.layer.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
+
+        for(var i=0; i<this.length; i++) {
+            var img = this.app.images[this.map[i].type];
+            if(!(this.map[i].type === 'star' && this.map[i].collided) && this.map[i].y-10 >= this.y){
                 this.app.layer.save()
                     .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
                     .translate(img.width/2, img.height/2)
@@ -183,7 +197,7 @@ NEIN.Score = {
 
 playground({
     create: function() {
-        this.loadImage("nein","tor","stamm","star","stone","tree","watch");
+        this.loadImage("nein","tor","stamm","star","stone","tree","watch","crashed");
         this.loadAtlas("guy");
         this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4","yay");
     },
