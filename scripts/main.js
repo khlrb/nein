@@ -21,8 +21,8 @@ NEIN.Main = {
 	enter: function() {
 		this.x = 298;
 		this.y = -64;
-		this.v = 10;
-		this.a = 20;
+		this.v = 50;
+		this.a = 10;
 		this.offset = 240;
 
 		this.map = [];
@@ -35,7 +35,7 @@ NEIN.Main = {
 	leave: function() {
 	},
 	step: function(dt) {
-		this.v += dt*this.a;
+		this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
 
 		if(this.app.keyboard.keys.right) {
 			this.x = this.x + dt*100 > 576 ? 576 : this.x + dt*100;
@@ -46,6 +46,8 @@ NEIN.Main = {
 		}
 
 		this.y += dt*this.v;
+
+		if(this.y > 32500) this.app.setState(NEIN.Score);
 	},
 	render: function(dt) {
 		var current = this.v > 40 ? (this.app.lifetime % 2 / 2) * this.app.atlases.guy.frames.length | 0 : 0;
@@ -57,6 +59,10 @@ NEIN.Main = {
 		for(i=0; i<400; i++) {
 			this.app.layer.drawImage(this.map[i].type, this.map[i].x, this.map[i].y-this.y+this.offset);
 		}
+
+		this.app.layer
+			.fillStyle("#ff00ff")
+			.fillRect(0, 32300-this.y+this.offset, 640, 40);
 	}
 };
 
@@ -66,6 +72,9 @@ NEIN.Score = {
 	enter: function() {
 	},
 	render: function(dt) {
+		this.app.layer
+			.fillStyle("#000")
+			.fillRect(0, 0, 640, 480);
 	}
 };
 
