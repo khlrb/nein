@@ -23,10 +23,15 @@ NEIN.Main = {
 		this.y = -64;
 		this.v = 50;
 		this.a = 10;
+        this.stars = 0;
 		this.offset = 240;
 
 		this.map = [];
-		var obstacles = [this.app.images.stamm, this.app.images.tor];
+		var obstacles = ['stamm',
+                         'tor',
+                         'star',
+                         'stone',
+                         'tree'];
 
 		for(var i=0; i<400; i++) {
 			this.map.push({"x": Math.random()*640-64,
@@ -57,16 +62,26 @@ NEIN.Main = {
             var collidingObstacles = [];
             var that = this;
             var guy = this.app.atlases.guy.frames[0];
-            this.map.forEach(function(obstacle) {
-                if (obstacle.y <= that.y + guy.height && obstacle.y + obstacle.type.height >= that.y)
-                    if(obstacle.x <= that.x + guy.width && obstacle.x + obstacle.type.width >= that.x)
+            this.map.forEach(function(obstacle, i) {
+                var img = that.app.images[obstacle.type];
+                if (obstacle.y <= that.y + guy.height && obstacle.y + img.height >= that.y)
+                    if(obstacle.x <= that.x + guy.width && obstacle.x + img.width >= that.x)
                         collidingObstacles.push(obstacle);
             });
             
-            if(collidingObstacles.length > 0) {
-                this.v = 50;
-                this.a = 10;
-            }
+            collidingObstacles.forEach(function(obst){
+                switch(obst.type){
+                case 'star':
+                    if(!obst.collected) {
+                        that.stars += 1;
+                        obst.collected = true;
+                    }
+                    break;
+                default:
+                    that.v = 50;
+                    that.a = 10;
+                }
+            });
         }
 	},
 	render: function(dt) {
@@ -77,14 +92,16 @@ NEIN.Main = {
 			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
 
 		for(var i=0; i<400; i++) {
-            this.app.layer.save()
-                .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
-                .translate(this.map[i].type.width/2, this.map[i].type.height/2)
-                .scale(this.map[i].mirrored?-1:1, 1)
-                .rotate(this.map[i].angle)
-                .drawImage(this.map[i].type, this.map[i].type.width/(-2), this.map[i].type.height/(-2))
-                .restore();
-			//this.app.layer.drawImage(this.map[i].type, this.map[i].x, this.map[i].y-this.y+this.offset);
+            var img = this.app.images[this.map[i].type];
+            if(!this.map[i].collected){
+                this.app.layer.save()
+                    .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
+                    .translate(img.width/2, img.height/2)
+                    .scale(this.map[i].mirrored?-1:1, 1)
+                    .rotate(this.map[i].angle)
+                    .drawImage(img, img.width/(-2), img.height/(-2))
+                    .restore();
+            }
 		}
 
 		this.app.layer
@@ -107,7 +124,7 @@ NEIN.Score = {
 
 playground({
 	create: function() {
-		this.loadImage("nein","tor","stamm");
+		this.loadImage("nein","tor","stamm","star","stone","tree");
 		this.loadAtlas("guy");	
 	},
 	ready: function() {
