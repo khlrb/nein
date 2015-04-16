@@ -29,7 +29,11 @@ NEIN.Main = {
 		var obstacles = [this.app.images.stamm, this.app.images.tor];
 
 		for(var i=0; i<400; i++) {
-			this.map.push({"x": Math.random()*640-64, "y": i*80+100, "type": obstacles[Math.floor(Math.random()*obstacles.length)]});
+			this.map.push({"x": Math.random()*640-64,
+                           "y": i*80+100,
+                           "type": obstacles[Math.floor(Math.random()*obstacles.length)],
+                           "angle": (Math.random()*Math.PI-(Math.PI/2))/10,
+                           "mirrored": Math.random()*2|0});
 		}
 	},
 	leave: function() {
@@ -73,7 +77,14 @@ NEIN.Main = {
 			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
 
 		for(var i=0; i<400; i++) {
-			this.app.layer.drawImage(this.map[i].type, this.map[i].x, this.map[i].y-this.y+this.offset);
+            this.app.layer.save()
+                .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
+                .translate(this.map[i].type.width/2, this.map[i].type.height/2)
+                .scale(this.map[i].mirrored?-1:1, 1)
+                .rotate(this.map[i].angle)
+                .drawImage(this.map[i].type, this.map[i].type.width/(-2), this.map[i].type.height/(-2))
+                .restore();
+			//this.app.layer.drawImage(this.map[i].type, this.map[i].x, this.map[i].y-this.y+this.offset);
 		}
 
 		this.app.layer
