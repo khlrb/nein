@@ -15,7 +15,7 @@ NEIN.Title = {
 	keydown: function(event) {
 		this.app.setState(NEIN.Main);
 	}
-}
+};
 
 NEIN.Main = {
 	enter: function() {
@@ -28,7 +28,7 @@ NEIN.Main = {
 		this.map = [];
 		var obstacles = [this.app.images.stamm, this.app.images.tor];
 
-		for(i=0; i<400; i++) {
+		for(var i=0; i<400; i++) {
 			this.map.push({"x": Math.random()*640-64, "y": i*80+100, "type": obstacles[Math.floor(Math.random()*obstacles.length)]});
 		}
 	},
@@ -42,12 +42,28 @@ NEIN.Main = {
 		}
 		
 		if(this.app.keyboard.keys.left) {
-			this.x = this.x - dt*100 < 0 ? 00 : this.x - dt*100;
+			this.x = this.x - dt*100 < 0 ? 0 : this.x - dt*100;
 		}
 
 		this.y += dt*this.v;
 
 		if(this.y > 32500) this.app.setState(NEIN.Score);
+        else{
+            //collision detection
+            var collidingObstacles = [];
+            var that = this;
+            var guy = this.app.atlases.guy.frames[0];
+            this.map.forEach(function(obstacle) {
+                if (obstacle.y <= that.y + guy.height && obstacle.y + obstacle.type.height >= that.y)
+                    if(obstacle.x <= that.x + guy.width && obstacle.x + obstacle.type.width >= that.x)
+                        collidingObstacles.push(obstacle);
+            });
+            
+            if(collidingObstacles.length > 0) {
+                this.v = 50;
+                this.a = 10;
+            }
+        }
 	},
 	render: function(dt) {
 		var current = this.v > 40 ? (this.app.lifetime % 2 / 2) * this.app.atlases.guy.frames.length | 0 : 0;
@@ -56,7 +72,7 @@ NEIN.Main = {
 			.clear("#fff")
 			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
 
-		for(i=0; i<400; i++) {
+		for(var i=0; i<400; i++) {
 			this.app.layer.drawImage(this.map[i].type, this.map[i].x, this.map[i].y-this.y+this.offset);
 		}
 
