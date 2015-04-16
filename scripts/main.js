@@ -40,8 +40,7 @@ NEIN.Main = {
         
         
         this.app.tween(this)
-            .to({offset: 239, pressButtonX: -100}, 2.5)
-            .to({offset: 240}, 0.5);
+            .to({offset: 240, pressButtonX: -100}, 3);
         
         this.finishline = {
             "y": this.length*80+300,
@@ -56,7 +55,7 @@ NEIN.Main = {
                          'tree'];
 
         for(var i=0; i<this.length; i++) {
-            this.map.push({"x": Math.random()*640-64,
+            this.map.push({"x": Math.random()*(640-64)+64,
                            "y": i*80+200,
                            "type": obstacles[Math.floor(Math.random()*obstacles.length)],
                            "angle": (Math.random()*Math.PI-(Math.PI/2))/10,
@@ -135,7 +134,7 @@ NEIN.Main = {
                         that.collisions += 1;
                         that.v = 50;
                         that.a = 10;
-                        that.penalty = 0.5;
+                        that.penalty = 1;
                         that.y += 10;
                         that.app.sound.play(that.crashes[Math.random()*that.crashes.length | 0]);
                     }
@@ -160,9 +159,10 @@ NEIN.Main = {
             .fillStyle("#fff")
             .fillText(Math.round(this.time*100)/100, 50, this.finishline.y-this.y+this.offset+35);
 
+        var guy = this.app.atlases.guy.frames[0];
         for(var i=0; i<this.length; i++) {
             var img = this.app.images[this.map[i].type];
-            if(!(this.map[i].type === 'star' && this.map[i].collided) && this.map[i].y-10 <= this.y) {
+            if(!(this.map[i].type === 'star' && this.map[i].collided) && this.map[i].y + img.height -10 <= this.y + guy.height) {
                 this.app.layer.save()
                     .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
                     .translate(img.width/2, img.height/2)
@@ -179,7 +179,7 @@ NEIN.Main = {
 
         for(var i=0; i<this.length; i++) {
             var img = this.app.images[this.map[i].type];
-            if(!(this.map[i].type === 'star' && this.map[i].collided) && this.map[i].y-10 >= this.y){
+            if(!(this.map[i].type === 'star' && this.map[i].collided) && (this.map[i].y + img.height -10 >= this.y + guy.height || this.type === 'star')){
                 this.app.layer.save()
                     .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
                     .translate(img.width/2, img.height/2)
