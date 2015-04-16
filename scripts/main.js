@@ -35,7 +35,7 @@ NEIN.Main = {
         
         this.finishline = {
             "y": this.length*80+300,
-            "textSize": 18
+            "textSize": 14
         }
 
         this.map = [];
@@ -77,7 +77,7 @@ NEIN.Main = {
             this.app.sound.play("yay");
             this.finished = true;
             this.app.tween(this.finishline)
-                .to({textSize: 30}, 0.15)
+                .to({textSize: 33}, 0.15)
                 .to({textSize: 25}, 0.1);
         }
         
