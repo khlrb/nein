@@ -24,6 +24,7 @@ NEIN.Main = {
 		this.v = 50;
 		this.a = 10;
         this.stars = 0;
+        this.collisions = 0;
 		this.offset = 240;
 
 		this.map = [];
@@ -64,22 +65,23 @@ NEIN.Main = {
             var guy = this.app.atlases.guy.frames[0];
             this.map.forEach(function(obstacle, i) {
                 var img = that.app.images[obstacle.type];
-                if (obstacle.y <= that.y + guy.height && obstacle.y + img.height >= that.y)
+                if (obstacle.y + img.height - 10 <= that.y + guy.height && obstacle.y + img.height >= that.y)
                     if(obstacle.x <= that.x + guy.width && obstacle.x + img.width >= that.x)
                         collidingObstacles.push(obstacle);
             });
             
             collidingObstacles.forEach(function(obst){
-                switch(obst.type){
-                case 'star':
-                    if(!obst.collected) {
+                if(!obst.collided) {
+                    obst.collided = true;
+                    switch(obst.type){
+                    case 'star':
                         that.stars += 1;
-                        obst.collected = true;
+                        break;
+                    default:
+                        that.collisions += 1;
+                        that.v = 50;
+                        that.a = 10;
                     }
-                    break;
-                default:
-                    that.v = 50;
-                    that.a = 10;
                 }
             });
         }
@@ -93,7 +95,7 @@ NEIN.Main = {
 
 		for(var i=0; i<400; i++) {
             var img = this.app.images[this.map[i].type];
-            if(!this.map[i].collected){
+            if(!(this.map[i].type === 'star' && this.map[i].collided)){
                 this.app.layer.save()
                     .translate(this.map[i].x, this.map[i].y-this.y+this.offset)
                     .translate(img.width/2, img.height/2)
