@@ -23,6 +23,7 @@ NEIN.Main = {
 		this.y = -64;
 		this.v = 50;
 		this.a = 10;
+		this.finished = false;
 		this.plings = ["pling0", "pling1", "pling2", "pling3"];
 		this.crashes = ["crash0", "crash1"];
 		this.steer = ["steer0", "steer1", "steer2", "steer3", "steer4"];
@@ -64,6 +65,11 @@ NEIN.Main = {
 		}
 
 		this.y += dt*this.v;
+
+		if(this.y > 32300 && !this.finished) {
+			this.app.sound.play("yay");
+			this.finished = true;
+		}
 
 		if(this.y > 32500) this.app.setState(NEIN.Score);
         else{
@@ -137,7 +143,7 @@ playground({
 	create: function() {
 		this.loadImage("nein","tor","stamm","star","stone","tree");
 		this.loadAtlas("guy");
-		this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4");
+		this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4","yay");
 	},
 	ready: function() {
 		this.setState(NEIN.Title);
