@@ -1,77 +1,89 @@
 var NEIN = {};
 
 NEIN.Title = {
-	render: function(dt) {
-		this.app.layer
-			.clear("#fff")
-			.fillStyle("#5555ee")
-			.fillRect(0, 0, 640, 300)
-			.drawImage(this.app.images.nein, 170, 20)
-			.font('12pt Monospace')
-			.textAlign('center')
-			.fillStyle("#111")
-			.fillText("press any key", 320, 420);
-	},
-	keydown: function(event) {
-		this.app.setState(NEIN.Main);
-	}
+    render: function(dt) {
+        this.app.layer
+            .clear("#fff")
+            .fillStyle("#5555ee")
+            .fillRect(0, 0, 640, 300)
+            .drawImage(this.app.images.nein, 170, 20)
+            .font('12pt Monospace')
+            .textAlign('center')
+            .fillStyle("#111")
+            .fillText("press any key", 320, 420);
+    },
+    keydown: function(event) {
+        this.app.setState(NEIN.Main);
+    }
 };
 
 NEIN.Main = {
-	enter: function() {
-		this.x = 298;
-		this.y = -64;
-		this.v = 50;
-		this.a = 10;
-		this.finished = false;
-		this.plings = ["pling0", "pling1", "pling2", "pling3"];
-		this.crashes = ["crash0", "crash1"];
-		this.steer = ["steer0", "steer1", "steer2", "steer3", "steer4"];
+    enter: function() {
+        this.x = 298;
+        this.y = -64;
+        this.v = 50;
+        this.a = 10;
+        this.finished = false;
+        this.plings = ["pling0", "pling1", "pling2", "pling3"];
+        this.crashes = ["crash0", "crash1"];
+        this.steer = ["steer0", "steer1", "steer2", "steer3", "steer4"];
         this.stars = 0;
         this.collisions = 0;
-		this.offset = 240;
+        this.time = 0;
+        this.length = 200;
+        this.offset = 240;
+        
+        this.finishline = {
+            "y": this.length*80+300,
+            "textSize": 18
+        }
 
-		this.map = [];
-		var obstacles = ['stamm',
+        this.map = [];
+        var obstacles = ['stamm',
                          'tor',
                          'star',
                          'stone',
                          'tree'];
 
-		for(var i=0; i<400; i++) {
-			this.map.push({"x": Math.random()*640-64,
+        for(var i=0; i<this.length; i++) {
+            this.map.push({"x": Math.random()*640-64,
                            "y": i*80+100,
                            "type": obstacles[Math.floor(Math.random()*obstacles.length)],
                            "angle": (Math.random()*Math.PI-(Math.PI/2))/10,
                            "mirrored": Math.random()*2|0});
-		}
-	},
-	leave: function() {
-	},
-	keydown: function(event) {
-		if(event.key === "left" || event.key === "right") {
-			this.app.sound.play(this.steer[Math.random()*this.steer.length | 0]);
-		}
-	},
-	step: function(dt) {
-		this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
+        }
+    },
+    leave: function() {
+    },
+    keydown: function(event) {
+        if(event.key === "left" || event.key === "right") {
+            this.app.sound.play(this.steer[Math.random()*this.steer.length | 0]);
+        }
+    },
+    step: function(dt) {
+        this.v = this.v + dt*this.a > 1000 ? 1000 : this.v + dt*this.a;
 
-		if(this.app.keyboard.keys.right) {
-			this.x = this.x + dt*100 > 576 ? 576 : this.x + dt*100;
-		}
-		
-		if(this.app.keyboard.keys.left) {
-			this.x = this.x - dt*100 < 0 ? 0 : this.x - dt*100;
-		}
+        if(this.app.keyboard.keys.right) {
+            this.x = this.x + dt*100 > 576 ? 576 : this.x + dt*100;
+        }
+        
+        if(this.app.keyboard.keys.left) {
+            this.x = this.x - dt*100 < 0 ? 0 : this.x - dt*100;
+        }
 
-		this.y += dt*this.v;
+        this.y += dt*this.v;
 
-		if(this.y > 32300 && !this.finished) {
-			this.app.sound.play("yay");
-			this.finished = true;
-		}
+        if(this.y + this.app.atlases.guy.frames[0].height > this.finishline.y && !this.finished) {
+            this.app.sound.play("yay");
+            this.finished = true;
+            this.app.tween(this.finishline)
+                .to({textSize: 30}, 0.15)
+                .to({textSize: 25}, 0.1);
+        }
+        
+        this.time += this.finished ? 0 : dt;
 
-		if(this.y > 32500) this.app.setState(NEIN.Score);
+        if(this.y > this.finishline.y + 200) this.app.setState(NEIN.Score);
         else{
             //collision detection
             var collidingObstacles = [];
@@ -90,28 +102,32 @@ NEIN.Main = {
                     switch(obst.type){
                     case 'star':
                         that.stars += 1;
-			that.app.sound.play(that.plings[Math.random()*that.plings.length | 0]);
+            that.app.sound.play(that.plings[Math.random()*that.plings.length | 0]);
                         break;
                     default:
                         that.collisions += 1;
                         that.v = 50;
                         that.a = 10;
-			that.app.sound.play(that.crashes[Math.random()*that.crashes.length | 0]);
+            that.app.sound.play(that.crashes[Math.random()*that.crashes.length | 0]);
                     }
                 }
             });
         }
-	},
-	render: function(dt) {
-		var current = this.v > 40 ? (this.app.lifetime % 2 / 2) * this.app.atlases.guy.frames.length | 0 : 0;
+    },
+    render: function(dt) {
+        var current = this.v > 40 ? (this.app.lifetime % 2 / 2) * this.app.atlases.guy.frames.length | 0 : 0;
         
-		this.app.layer
-			.clear("#fff")
+        this.app.layer
+            .clear("#fff")
             .fillStyle("#ff00ff")
-			.fillRect(0, 32300-this.y+this.offset, 640, 40)
-			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
+            .fillRect(0, this.finishline.y-this.y+this.offset, 640, 40)
+            .font(this.finishline.textSize.toString() + 'pt Monospace')
+            .textAlign('start')
+            .fillStyle("#fff")
+            .fillText(Math.round(this.time*100)/100, 50, this.finishline.y-this.y+this.offset+35)
+            .drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
 
-		for(var i=0; i<400; i++) {
+        for(var i=0; i<this.length; i++) {
             var img = this.app.images[this.map[i].type];
             if(!(this.map[i].type === 'star' && this.map[i].collided)){
                 this.app.layer.save()
@@ -122,33 +138,33 @@ NEIN.Main = {
                     .drawImage(img, img.width/(-2), img.height/(-2))
                     .restore();
             }
-		}
+        }
 
-	}
+    }
 };
 
 NEIN.Score = {
-	create: function() {
-	},
-	enter: function() {
-	},
-	render: function(dt) {
-		this.app.layer
-			.fillStyle("#000")
-			.fillRect(0, 0, 640, 480);
-	}
+    create: function() {
+    },
+    enter: function() {
+    },
+    render: function(dt) {
+        this.app.layer
+            .fillStyle("#000")
+            .fillRect(0, 0, 640, 480);
+    }
 };
 
 playground({
-	create: function() {
-		this.loadImage("nein","tor","stamm","star","stone","tree");
-		this.loadAtlas("guy");
-		this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4","yay");
-	},
-	ready: function() {
-		this.setState(NEIN.Title);
-	},
-	scale: 1,
-	width: 640,
-	height: 480
+    create: function() {
+        this.loadImage("nein","tor","stamm","star","stone","tree");
+        this.loadAtlas("guy");
+        this.loadSounds("pling0","pling1","pling2","pling3","crash0","crash1","steer0","steer1","steer2","steer3","steer4","yay");
+    },
+    ready: function() {
+        this.setState(NEIN.Title);
+    },
+    scale: 1,
+    width: 640,
+    height: 480
 });
