@@ -21,26 +21,21 @@ NEIN.Main = {
 	enter: function() {
 		this.x = 298;
 		this.y = -64;
-		this.v = 1;
-		this.a = 40;
+		this.v = 10;
+		this.a = 20;
 		this.offset = 240;
 
 		this.map = [];
 		var obstacles = [this.app.images.stamm, this.app.images.tor];
 
-		for(i=0; i<20; i++) {
-			this.map.push({"x": Math.random()*640-64, "y": i*100, "type": obstacles[Math.floor(Math.random()*obstacles.length)]});
+		for(i=0; i<400; i++) {
+			this.map.push({"x": Math.random()*640-64, "y": i*80+100, "type": obstacles[Math.floor(Math.random()*obstacles.length)]});
 		}
 	},
 	leave: function() {
 	},
 	step: function(dt) {
-		if(this.app.keyboard.keys.down) {
-			this.v += dt*this.a;
-		}
-		else if(this.app.keyboard.keys.up) {
-			this.v = this.v - dt*this.a < 0 ? 0 : this.v - dt*this.a;
-		}
+		this.v += dt*this.a;
 
 		if(this.app.keyboard.keys.right) {
 			this.x = this.x + dt*100 > 576 ? 576 : this.x + dt*100;
@@ -59,7 +54,7 @@ NEIN.Main = {
 			.clear("#fff")
 			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
 
-		for(i=0; i<20; i++) {
+		for(i=0; i<400; i++) {
 			this.app.layer.drawImage(this.map[i].type, this.map[i].x, this.map[i].y-this.y+this.offset);
 		}
 	}
