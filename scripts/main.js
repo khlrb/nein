@@ -88,9 +88,11 @@ NEIN.Main = {
 	},
 	render: function(dt) {
 		var current = this.v > 40 ? (this.app.lifetime % 2 / 2) * this.app.atlases.guy.frames.length | 0 : 0;
-
+        
 		this.app.layer
 			.clear("#fff")
+            .fillStyle("#ff00ff")
+			.fillRect(0, 32300-this.y+this.offset, 640, 40)
 			.drawAtlasFrame(this.app.atlases.guy, current, this.x, this.offset);
 
 		for(var i=0; i<400; i++) {
@@ -106,9 +108,6 @@ NEIN.Main = {
             }
 		}
 
-		this.app.layer
-			.fillStyle("#ff00ff")
-			.fillRect(0, 32300-this.y+this.offset, 640, 40);
 	}
 };
 
