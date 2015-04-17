@@ -191,7 +191,7 @@ NEIN.Main = {
                 .drawAtlasFrame(this.currentAtlas, current, guy.width/-2, guy.height/-2)
                 .restore();
         }
-        if(this.wait > 0.5) this.app.layer.fillStyle('#fff')
+        if(this.wait > 0) this.app.layer.fillStyle('#fff')
                                 .fillRect(0, 300, 640, 80);
 
         for(var i=0; i<this.length; i++) {
