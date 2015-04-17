@@ -57,7 +57,7 @@ NEIN.Main = {
                          'tree'];
 
         for(var i=0; i<this.length; i++) {
-            this.map.push({"x": Math.random()*(640-64)+64,
+            this.map.push({"x": Math.random()*(640-64),
                            "y": i*80+200,
                            "type": obstacles[Math.floor(Math.random()*obstacles.length)],
                            "angle": (Math.random()*Math.PI-(Math.PI/2))/10,
